@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酥酥鱼的拼豆转化器 🐟</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="floating-bubbles">
+        <span class="bubble">🫧</span>
+        <span class="bubble">🐠</span>
+        <span class="bubble">🫧</span>
+        <span class="bubble">✨</span>
+        <span class="bubble">🐟</span>
+        <span class="bubble">🫧</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-area">
+                <span class="fish-icon">🐟</span>
+                <div class="title-wrap">
+                    <h1>酥酥鱼的拼豆转化器</h1>
+                    <p class="subtitle">让每一颗拼豆都找到归属 ✨</p>
+                </div>
+                <span class="fish-icon flip">🐟</span>
+            </div>
+            <p class="tagline">上传图片 → 魔法转换 → 开始拼豆！</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group upload-area">
+                <label for="imageInput">
+                    <span class="label-icon">📁</span> 选择图片
+                </label>
+                <div class="file-input-wrapper">
+                    <input 
+                        type="file" 
+                        id="imageInput" 
+                        accept="image/*"
+                        title="选择要转换的图片"
+                    >
+                    <span class="file-hint">支持 JPG、PNG、GIF 等格式</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="pixelSize">
+                    <span class="label-icon">🔲</span> 像素大小
+                </label>
+                <div class="slider-container">
+                    <span class="slider-label">细腻</span>
+                    <input 
+                        type="range" 
+                        id="pixelSize" 
+                        min="4" 
+                        max="50" 
+                        value="16"
+                        title="调整像素块的大小"
+                    >
+                    <span class="slider-label">粗犷</span>
+                    <span class="value-display" id="pixelSizeValue">16</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="paletteSelect">
+                    <span class="label-icon">🎨</span> 色板选择
+                </label>
+                <select id="paletteSelect">
+                    <option value="original">原有200+色号 (默认)</option>
+                    <option value="excel">电子色号表 (Excel)</option>
+                </select>
+            </div>
+
+            <div class="control-group checkbox-group">
+                <label for="showLegend" class="checkbox-label">
+                    <input type="checkbox" id="showLegend" checked>
+                    <span class="checkbox-custom"></span>
+                    显示色号标签
+                </label>
+                <label for="showGridLines" class="checkbox-label">
+                    <input type="checkbox" id="showGridLines">
+                    <span class="checkbox-custom"></span>
+                    显示辅助网格
+                </label>
+            </div>
+
+            <div class="button-group">
+                <button id="convertBtn" class="btn btn-primary" disabled>
+                    <span class="btn-icon">✨</span> 开始转换
+                </button>
+                <button id="downloadBtn" class="btn btn-secondary" disabled>
+                    <span class="btn-icon">📥</span> 下载图片
+                </button>
+                <button id="downloadJsonBtn" class="btn btn-secondary" disabled>
+                    <span class="btn-icon">📊</span> 下载数据
+                </button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="canvas-section">
+                <h2><span class="section-icon">🖼️</span> 原始图片</h2>
+                <div class="canvas-container">
+                    <canvas id="previewCanvas"></canvas>
+                    <div id="noImageMsg" class="no-image-msg">
+                        <span class="empty-icon">🐠</span>
+                        <p>把图片丢进来吧~</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-section">
+                <h2><span class="section-icon">🎯</span> 拼豆图纸</h2>
+                <div class="canvas-container">
+                    <canvas id="pixelCanvas"></canvas>
+                    <div id="noResultMsg" class="no-image-msg">
+                        <span class="empty-icon">🐟</span>
+                        <p>转换后的拼豆图纸会在这里哦~</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="palette-section">
+            <h2><span class="section-icon">🌈</span> 色板统计</h2>
+            <div class="palette-info">
+                <div class="info-card">
+                    <span class="info-label">使用的颜色总数</span>
+                    <span class="info-value" id="colorUsageCount">0</span>
+                    <span class="info-unit">种</span>
+                </div>
+            </div>
+            <div class="palette-container" id="paletteContainer"></div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <span class="footer-fish">🐟</span>
+                <p>小提示：调整像素大小可以改变细节程度 | 点击结果图片可以缩放查看</p>
+                <span class="footer-fish flip">🐟</span>
+            </div>
+            <p class="copyright">Made with 💖 by 酥酥鱼</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
