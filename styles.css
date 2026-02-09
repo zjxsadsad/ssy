@@ -83,12 +83,14 @@ body {
 .container {
     max-width: 1000px;
     margin: 20px auto;
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
+    /* 更加通透的磨砂玻璃效果，带一点点暖调 */
+    background: rgba(255, 255, 255, 0.85);
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 245, 247, 0.6) 100%);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: 30px;
-    box-shadow: 0 20px 80px rgba(104, 191, 176, 0.1);
+    box-shadow: 0 20px 80px rgba(104, 191, 176, 0.15);
     overflow: hidden;
     position: relative;
     z-index: 1;
@@ -96,11 +98,12 @@ body {
 
 /* ========== 头部区域 (全新重构) ========== */
 .header {
-    background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
+    /* 头部增加微弱的渐变，不再是死白 */
+    background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.6) 100%);
     padding: 50px 30px 40px;
     text-align: center;
     position: relative;
-    border-bottom: 2px dashed var(--primary-light);
+    border-bottom: 2px dashed rgba(152, 230, 216, 0.3);
 }
 
 .brand-badge {
@@ -138,10 +141,12 @@ body {
 }
 
 .header h1 {
-    font-family: 'Ma Shan Zheng', cursive, sans-serif;
+    /* 恢复为 Quicksand 字体，更圆润可爱，不再强制使用毛笔字 */
+    font-family: 'Quicksand', 'Microsoft YaHei', sans-serif;
+    font-weight: 700;
     font-size: 3em;
     color: var(--primary-dark);
-    text-shadow: 3px 3px 0px var(--primary-light);
+    text-shadow: 2px 2px 0px var(--primary-light);
     margin-bottom: 8px;
     letter-spacing: 2px;
 }
@@ -192,13 +197,14 @@ body {
 
 /* ========== 控制面板 ========== */
 .control-panel {
-    background: rgba(255, 255, 255, 0.6);
+    /* 面板背景调整为更淡的暖色，增加层次 */
+    background: rgba(255, 252, 247, 0.4);
     padding: 30px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 30px;
     align-items: start;
-    border-bottom: 2px dashed var(--primary-light);
+    border-bottom: 2px dashed rgba(152, 230, 216, 0.3);
 }
 
 .control-group {
@@ -474,7 +480,8 @@ select:hover, select:focus {
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     padding: 40px;
-    background: rgba(255, 255, 255, 0.4);
+    /* 增加非常淡的薄荷绿渐变 */
+    background: linear-gradient(180deg, rgba(240, 252, 250, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
 }
 
 .canvas-section {
@@ -576,8 +583,9 @@ select:hover, select:focus {
 /* ========== 色板区域 ========== */
 .palette-section {
     padding: 30px 40px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.8) 100%);
-    border-top: 2px dashed var(--primary-light);
+    /* 色板区域使用淡粉色渐变背景 */
+    background: linear-gradient(180deg, rgba(255, 248, 248, 0.4) 0%, rgba(255, 255, 255, 0.6) 100%);
+    border-top: 2px dashed rgba(152, 230, 216, 0.3);
 }
 
 .palette-section h2 {
