@@ -687,9 +687,19 @@ select:hover, select:focus {
 }
 
 .copyright {
-    font-size: 0.85em !important;
+    font-size: 0.9em !important;
     color: var(--text-light) !important;
-    margin-top: 5px;
+    margin-top: 8px;
+}
+
+.author-highlight {
+    font-weight: 700;
+    color: var(--primary-dark);
+    font-size: 1.2em;
+    background: linear-gradient(120deg, transparent 0%, transparent 6px, #ffe4e6 6px, #ffe4e6 100%);
+    padding: 0 4px;
+    border-radius: 4px;
+    margin-left: 2px;
 }
 
 /* ========== 响应式设计 ========== */

@@ -1463,8 +1463,9 @@ class PixelArtConverter {
     /**
      * 转换图片为像素网格
      * @param {number} pixelSize - 每个像素块的大小（像素）
+     * @param {boolean} mirror - 是否镜像
      */
-    convert(pixelSize = 16) {
+    convert(pixelSize = 16, mirror = false) {
         if (!this.originalImage) return false;
 
         this.pixelSize = pixelSize;
@@ -1481,6 +1482,13 @@ class PixelArtConverter {
 
         // 将原图像素化缩放到网格大小
         ctx.imageSmoothingEnabled = false;
+
+        ctx.save();
+        if (mirror) {
+            ctx.translate(this.gridWidth, 0);
+            ctx.scale(-1, 1);
+        }
+
         ctx.drawImage(
             this.originalImage,
             0, 0,
@@ -1490,6 +1498,7 @@ class PixelArtConverter {
             this.gridWidth,
             this.gridHeight
         );
+        ctx.restore();
 
         // 获取像素数据
         const imageData = ctx.getImageData(0, 0, this.gridWidth, this.gridHeight);
@@ -1596,11 +1605,47 @@ class PixelArtConverter {
             renderScale = Math.max(this.pixelSize, 32);
         }
 
-        canvas.width = this.gridWidth * renderScale;
-        canvas.height = this.gridHeight * renderScale;
+        // 标尺区域大小 (留出一行一列的空间)
+        const rulerSize = Math.max(20, renderScale);
+
+        canvas.width = this.gridWidth * renderScale + rulerSize;
+        canvas.height = this.gridHeight * renderScale + rulerSize;
 
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingEnabled = false;
+
+        // 填充白色背景
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 绘制标尺数字
+        ctx.fillStyle = '#666';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const fontSize = Math.min(Math.floor(rulerSize * 0.5), 16);
+        ctx.font = `bold ${fontSize}px "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+
+        // 顶部标尺 (列号)
+        for (let x = 0; x < this.gridWidth; x++) {
+            ctx.fillText(
+                x + 1,
+                rulerSize + x * renderScale + renderScale / 2,
+                rulerSize / 2
+            );
+        }
+
+        // 左侧标尺 (行号)
+        for (let y = 0; y < this.gridHeight; y++) {
+            ctx.fillText(
+                y + 1,
+                rulerSize / 2,
+                rulerSize + y * renderScale + renderScale / 2
+            );
+        }
+
+        // 绘制像素块区域偏移
+        const startX = rulerSize;
+        const startY = rulerSize;
 
         // 绘制像素块
         for (let y = 0; y < this.gridHeight; y++) {
@@ -1609,32 +1654,35 @@ class PixelArtConverter {
                 const colorIndex = this.pixelData[index];
                 const color = this.colorPalette[colorIndex];
 
+                const drawX = startX + x * renderScale;
+                const drawY = startY + y * renderScale;
+
                 // 绘制颜色块
                 ctx.fillStyle = this.hexToRgb(color.hex);
-                ctx.fillRect(x * renderScale, y * renderScale, renderScale, renderScale);
+                ctx.fillRect(drawX, drawY, renderScale, renderScale);
 
                 // 绘制边框
                 // 边框宽度也随比例调整，但最细为1px
                 const borderWidth = Math.max(1, renderScale / 20);
                 ctx.strokeStyle = '#ccc';
                 ctx.lineWidth = borderWidth;
-                ctx.strokeRect(x * renderScale, y * renderScale, renderScale, renderScale);
+                ctx.strokeRect(drawX, drawY, renderScale, renderScale);
 
                 // 显示色号标签
                 if (showLabels && this.pixelSize >= 10) {
                     ctx.fillStyle = this.getContrastColor(color.hex);
                     // 调整字体大小比例，使其更清晰
                     // 对于32px方块，大约使用11-12px字体
-                    const fontSize = Math.floor(renderScale * 0.4);
+                    const labelFontSize = Math.floor(renderScale * 0.4);
                     // 使用 sans-serif 保证清晰度，Arial 有时在某些系统上渲染较细
-                    ctx.font = `bold ${fontSize}px "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+                    ctx.font = `bold ${labelFontSize}px "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     
                     ctx.fillText(
                         color.id,
-                        x * renderScale + renderScale / 2,
-                        y * renderScale + renderScale / 2
+                        drawX + renderScale / 2,
+                        drawY + renderScale / 2
                     );
                 }
             }
@@ -1656,8 +1704,8 @@ class PixelArtConverter {
                      ctx.strokeStyle = isCoarse ? 'rgba(255, 0, 0, 0.95)' : 'rgba(255, 0, 0, 0.75)';
                      
                      ctx.beginPath();
-                     ctx.moveTo(x * renderScale, 0);
-                     ctx.lineTo(x * renderScale, canvas.height);
+                     ctx.moveTo(startX + x * renderScale, startY);
+                     ctx.lineTo(startX + x * renderScale, canvas.height);
                      ctx.stroke();
                 }
             }
@@ -1672,8 +1720,8 @@ class PixelArtConverter {
                      ctx.strokeStyle = isCoarse ? 'rgba(255, 0, 0, 0.95)' : 'rgba(255, 0, 0, 0.75)';
                      
                      ctx.beginPath();
-                     ctx.moveTo(0, y * renderScale);
-                     ctx.lineTo(canvas.width, y * renderScale);
+                     ctx.moveTo(startX, startY + y * renderScale);
+                     ctx.lineTo(canvas.width, startY + y * renderScale);
                      ctx.stroke();
                  }
             }
@@ -1756,6 +1804,7 @@ const pixelSizeValue = document.getElementById('pixelSizeValue');
 const paletteSelect = document.getElementById('paletteSelect');
 const showLegendCheckbox = document.getElementById('showLegend');
 const showGridLinesCheckbox = document.getElementById('showGridLines');
+const mirrorCheckbox = document.getElementById('mirrorImage');
 const convertBtn = document.getElementById('convertBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const downloadJsonBtn = document.getElementById('downloadJsonBtn');
@@ -1763,6 +1812,7 @@ const previewCanvas = document.getElementById('previewCanvas');
 const pixelCanvas = document.getElementById('pixelCanvas');
 const paletteContainer = document.getElementById('paletteContainer');
 const colorUsageCount = document.getElementById('colorUsageCount');
+const totalBlockCount = document.getElementById('totalBlockCount');
 const noImageMsg = document.getElementById('noImageMsg');
 const noResultMsg = document.getElementById('noResultMsg');
 
@@ -1858,8 +1908,9 @@ function handleOptionChange() {
 
 function handleConvert() {
     const pixelSize = parseInt(pixelSizeSlider.value);
+    const mirror = mirrorCheckbox.checked;
     
-    if (!converter.convert(pixelSize)) {
+    if (!converter.convert(pixelSize, mirror)) {
         alert('转换失败！');
         return;
     }
@@ -1882,6 +1933,12 @@ function updatePaletteDisplay() {
     
     paletteContainer.innerHTML = '';
     colorUsageCount.textContent = palette.length;
+
+    // 计算总块数
+    const totalBlocks = palette.reduce((sum, color) => sum + color.count, 0);
+    if (totalBlockCount) {
+        totalBlockCount.textContent = totalBlocks;
+    }
     
     palette.forEach((color) => {
         // 创建卡片
@@ -1917,11 +1974,21 @@ function updatePaletteDisplay() {
         hexValue.textContent = color.hex;
         
         hexRow.appendChild(hexValue);
+
+        // 第四行：数量统计
+        const countRow = document.createElement('div');
+        countRow.className = 'color-card-count-row';
+        countRow.textContent = `× ${color.count}`;
+        countRow.style.fontSize = '12px';
+        countRow.style.color = '#666';
+        countRow.style.marginTop = '2px';
+        countRow.style.textAlign = 'right';
         
         // 组装
         details.appendChild(smallId);
         details.appendChild(bigId);
         details.appendChild(hexRow);
+        details.appendChild(countRow);
         
         colorItem.appendChild(square);
         colorItem.appendChild(details);
