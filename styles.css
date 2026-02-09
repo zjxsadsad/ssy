@@ -881,11 +881,6 @@ select:hover, select:focus {
     .divider, .heart-beat {
         display: none;
     }
-    
-    .copyright-text::after {
-        content: '';
-        display: none;
-    }
 }
 
 /* ========== 滚动条美化 ========== */
