@@ -1621,68 +1621,90 @@ class PixelArtConverter {
         // 绘制标尺数字背景和边框
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const fontSize = Math.min(Math.floor(rulerSize * 0.5), 14);
-        ctx.font = `bold ${fontSize}px "Quicksand", "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
         
-        const rulerBgColor = '#F0FAF9';   // 清新薄荷淡背景
-        const rulerBorderColor = '#D1E8E2'; // 柔和边框
-        const rulerTextColor = '#6A7B8C';   // 品牌文字色
+        // 动态计算字体大小，保证放入框内
+        // 标尺宽度 renderScale
+        // 标尺高度 rulerSize
+        const fontSize = Math.min(Math.floor(renderScale * 0.5), Math.floor(rulerSize * 0.6), 14);
+        ctx.font = `600 ${fontSize}px "Quicksand", "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+        
+        const rulerBgStr = '#FFFFFF';       // 纯白底色，更清新
+        const rulerBorderStr = '#BCE0DA';   // 略深的薄荷绿边框
+        const rulerTextStr = '#5A7D7C';     // 协调的文字颜色
+        
+        const badgeRadius = 4; // 圆角半径
 
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5; // 稍微加粗一点边框
 
         // 顶部标尺 (列号)
         for (let x = 0; x < this.gridWidth; x++) {
-            const rectX = rulerSize + x * renderScale;
-            const rectY = 0;
-            const rectW = renderScale;
-            const rectH = rulerSize;
+            const cx = rulerSize + x * renderScale + renderScale / 2;
+            const cy = rulerSize / 2;
+            
+            // 计算Badge大小 (留出一点padding)
+            const badgeW = Math.min(renderScale - 2, 40); // 限制最大宽度
+            const badgeH = rulerSize - 4;
+            const badgeX = cx - badgeW / 2;
+            const badgeY = cy - badgeH / 2;
 
-            // 背景
-            ctx.fillStyle = rulerBgColor;
-            ctx.fillRect(rectX, rectY, rectW, rectH);
-            
-            // 边框
-            ctx.strokeStyle = rulerBorderColor;
-            ctx.strokeRect(rectX, rectY, rectW, rectH);
-            
+            // 只有当格子足够宽时才绘制边框背景
+            if (badgeW > 8) {
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, badgeRadius);
+                } else {
+                    ctx.rect(badgeX, badgeY, badgeW, badgeH);
+                }
+                ctx.fillStyle = rulerBgStr;
+                ctx.fill();
+                ctx.strokeStyle = rulerBorderStr;
+                ctx.stroke();
+            }
+
             // 文字
-            ctx.fillStyle = rulerTextColor;
-            ctx.fillText(
-                x + 1,
-                rectX + rectW / 2,
-                rectY + rectH / 2
-            );
+            ctx.fillStyle = rulerTextStr;
+            // 只有空间足够才画文字
+            if (renderScale > 8) {
+                ctx.fillText(x + 1, cx, cy + 1); // +1 微调垂直居中
+            }
         }
 
         // 左侧标尺 (行号)
         for (let y = 0; y < this.gridHeight; y++) {
-            const rectX = 0;
-            const rectY = rulerSize + y * renderScale;
-            const rectW = rulerSize;
-            const rectH = renderScale;
+            const cx = rulerSize / 2;
+            const cy = rulerSize + y * renderScale + renderScale / 2;
+            
+            const badgeW = rulerSize - 4;
+            const badgeH = Math.min(renderScale - 2, 30);
+            const badgeX = cx - badgeW / 2;
+            const badgeY = cy - badgeH / 2;
 
-            // 背景
-            ctx.fillStyle = rulerBgColor;
-            ctx.fillRect(rectX, rectY, rectW, rectH);
+            if (badgeH > 8) {
+                ctx.beginPath();
+                if (ctx.roundRect) {
+                    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, badgeRadius);
+                } else {
+                    ctx.rect(badgeX, badgeY, badgeW, badgeH);
+                }
+                ctx.fillStyle = rulerBgStr;
+                ctx.fill();
+                ctx.strokeStyle = rulerBorderStr;
+                ctx.stroke();
+            }
             
-            // 边框
-            ctx.strokeStyle = rulerBorderColor;
-            ctx.strokeRect(rectX, rectY, rectW, rectH);
-            
-            // 文字
-            ctx.fillStyle = rulerTextColor;
-            ctx.fillText(
-                y + 1,
-                rectX + rectW / 2,
-                rectY + rectH / 2
-            );
+            ctx.fillStyle = rulerTextStr;
+            if (renderScale > 8) {
+                ctx.fillText(y + 1, cx, cy + 1);
+            }
         }
 
-        // 左上角空白区域
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, rulerSize, rulerSize);
-        ctx.strokeStyle = rulerBorderColor;
-        ctx.strokeRect(0, 0, rulerSize, rulerSize);
+        // 左上角装饰：一个小爱心或圆点
+        ctx.clearRect(0, 0, rulerSize, rulerSize);
+        ctx.beginPath();
+        ctx.arc(rulerSize/2, rulerSize/2, 3, 0, Math.PI * 2);
+        ctx.fillStyle = rulerBorderStr;
+        ctx.fill();
+
 
         // 绘制像素块区域偏移
         const startX = rulerSize;
