@@ -1391,7 +1391,7 @@ const COLORS_EXCEL = [
   { "id": "B32", "hex": "#92B060" }
 ];
 
-let MARD_COLORS = COLORS_ORIGINAL;
+let MARD_COLORS = COLORS_EXCEL;
 
 // ========== 图片处理模块 ==========
 
