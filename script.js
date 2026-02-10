@@ -1618,30 +1618,71 @@ class PixelArtConverter {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 绘制标尺数字
-        ctx.fillStyle = '#666';
+        // 绘制标尺数字背景和边框
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const fontSize = Math.min(Math.floor(rulerSize * 0.5), 16);
-        ctx.font = `bold ${fontSize}px "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+        const fontSize = Math.min(Math.floor(rulerSize * 0.5), 14);
+        ctx.font = `bold ${fontSize}px "Quicksand", "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+        
+        const rulerBgColor = '#F0FAF9';   // 清新薄荷淡背景
+        const rulerBorderColor = '#D1E8E2'; // 柔和边框
+        const rulerTextColor = '#6A7B8C';   // 品牌文字色
+
+        ctx.lineWidth = 1;
 
         // 顶部标尺 (列号)
         for (let x = 0; x < this.gridWidth; x++) {
+            const rectX = rulerSize + x * renderScale;
+            const rectY = 0;
+            const rectW = renderScale;
+            const rectH = rulerSize;
+
+            // 背景
+            ctx.fillStyle = rulerBgColor;
+            ctx.fillRect(rectX, rectY, rectW, rectH);
+            
+            // 边框
+            ctx.strokeStyle = rulerBorderColor;
+            ctx.strokeRect(rectX, rectY, rectW, rectH);
+            
+            // 文字
+            ctx.fillStyle = rulerTextColor;
             ctx.fillText(
                 x + 1,
-                rulerSize + x * renderScale + renderScale / 2,
-                rulerSize / 2
+                rectX + rectW / 2,
+                rectY + rectH / 2
             );
         }
 
         // 左侧标尺 (行号)
         for (let y = 0; y < this.gridHeight; y++) {
+            const rectX = 0;
+            const rectY = rulerSize + y * renderScale;
+            const rectW = rulerSize;
+            const rectH = renderScale;
+
+            // 背景
+            ctx.fillStyle = rulerBgColor;
+            ctx.fillRect(rectX, rectY, rectW, rectH);
+            
+            // 边框
+            ctx.strokeStyle = rulerBorderColor;
+            ctx.strokeRect(rectX, rectY, rectW, rectH);
+            
+            // 文字
+            ctx.fillStyle = rulerTextColor;
             ctx.fillText(
                 y + 1,
-                rulerSize / 2,
-                rulerSize + y * renderScale + renderScale / 2
+                rectX + rectW / 2,
+                rectY + rectH / 2
             );
         }
+
+        // 左上角空白区域
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, rulerSize, rulerSize);
+        ctx.strokeStyle = rulerBorderColor;
+        ctx.strokeRect(0, 0, rulerSize, rulerSize);
 
         // 绘制像素块区域偏移
         const startX = rulerSize;
